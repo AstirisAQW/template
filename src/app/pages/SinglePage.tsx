@@ -1,16 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import 'antd/dist/reset.css'; // If you're using Ant Design styling
+import 'antd/dist/reset.css';
 import { Button, Input, Typography, Row, Col, notification, Spin } from 'antd';
-import TodoTable from '../components/todo/TodoTable'; // Reusing TodoTable
+import TodoTable from '../components/todo/TodoTable';
 import { TaskEntity } from '../../domain/entities/TaskEntity';
+import { GetAllTask_Service, GetTask_Service, RemoveTask_Service, UpdateTask_Service, AddTask_Service} from "../services/taskServices";
 
-// Import our task use cases from the service
-import {
-  addTaskUsecase,
-  getAllTasksUsecase,
-  removeTaskUsecase,
-  updateTaskUsecase, // Import if you add update functionality later
-} from '../services/taskServices'; // Correct path to your service file
 
 function SinglePage() {
   const [taskTitle, setTaskTitle] = useState("");
@@ -21,7 +15,7 @@ function SinglePage() {
   const loadTasks = useCallback(async () => {
     setIsLoading(true);
     try {
-      const fetchedTasks = await getAllTasksUsecase.execute();
+      const fetchedTasks = await GetAllTask_Service.execute();
       setTasks(fetchedTasks);
     } catch (error: any) {
       console.error("Failed to load tasks:", error);
@@ -54,7 +48,7 @@ function SinglePage() {
     setIsLoading(true); // Indicate loading for add operation
     try {
       // The AddTaskUsecase expects params like { title: string }
-      const newTaskEntity = await addTaskUsecase.execute({ title: taskTitle });
+      const newTaskEntity = await AddTask_Service.execute({ title: taskTitle });
       setTasks(prevTasks => [...prevTasks, newTaskEntity]); // Add to local state
       setTaskTitle(""); // Clear input
       notification.success({
@@ -74,7 +68,7 @@ function SinglePage() {
   const handleDeleteTask = async (taskToDelete: TaskEntity) => {
     setIsLoading(true); // Indicate loading for delete operation
     try {
-      await removeTaskUsecase.execute(taskToDelete.id);
+      await RemoveTask_Service.execute(taskToDelete.id);
       setTasks(prevTasks => prevTasks.filter(task => task.id !== taskToDelete.id)); // Remove from local state
       notification.success({
         message: 'Task deleted successfully!',
@@ -94,7 +88,7 @@ function SinglePage() {
    const handleUpdateTask = async (taskToUpdate: TaskEntity, newTitle: string) => {
    setIsLoading(true);
    try {
-     const updatedTask = await updateTaskUsecase.execute({ id: taskToUpdate.id, title: newTitle });
+     const updatedTask = await UpdateTask_Service.execute({ id: taskToUpdate.id, title: newTitle });
        setTasks(prevTasks => prevTasks.map(task => (task.id === updatedTask.id ? updatedTask : task)));
        notification.success({ message: 'Task updated successfully!' });
      } catch (error: any) {
