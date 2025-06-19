@@ -45,7 +45,7 @@ export const updateExistingAppTask = createAsyncThunk(
     }
 );
 
-const appTasksSlice = createSlice({
+const appTaskSlice = createSlice({
     name: 'appTasks',
     initialState,
     reducers: {
@@ -89,19 +89,19 @@ const appTasksSlice = createSlice({
             .addCase(deleteAppTask.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
+            })
+
+            .addCase(updateExistingAppTask.fulfilled, (state, action: PayloadAction<TaskEntity>) => {
+              state.status = 'succeeded';
+              const index = state.tasks.findIndex(task => task.id === action.payload.id);
+              if (index !== -1) {
+                state.tasks[index] = action.payload;
+              }
             });
-            // Update Task (if implemented)
-            // .addCase(updateExistingAppTask.fulfilled, (state, action: PayloadAction<TaskEntity>) => {
-            //   state.status = 'succeeded';
-            //   const index = state.tasks.findIndex(task => task.id === action.payload.id);
-            //   if (index !== -1) {
-            //     state.tasks[index] = action.payload;
-            //   }
-            // })
     },
 });
 
 // Export any synchronous actions if you created them in reducers: {}
 // export const { someSyncAction } = appTasksSlice.actions;
 
-export default appTasksSlice.reducer;
+export default appTaskSlice.reducer;
