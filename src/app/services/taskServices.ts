@@ -3,7 +3,7 @@ import { InMemoryTaskRepository } from "../../data/InMemory_TaskRepository";
 import { LocalStorageTaskRepository } from "../../data/LocalStorage_TaskRepository";
 
 import { AddTask_Usecase } from "../../domain/usecases/AddTask_Usecase";
-import { GetAllTask_Usecase } from "../../domain/usecases/GetAllTask_UseCase";
+import { GetAllTask_Usecase } from "../../domain/usecases/GetAllTask_Usecase";
 import { RemoveTask_Usecase } from "../../domain/usecases/RemoveTask_Usecase";
 import { UpdateTask_Usecase } from "../../domain/usecases/UpdateTask_Usecase";
 import { GetTask_Usecase } from "../../domain/usecases/GetTask_Usecase";
