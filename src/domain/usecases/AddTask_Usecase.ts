@@ -5,7 +5,7 @@ export interface AddTaskParams{
     title: string;
 }
 
-export class AddTaskUsecase{
+export class AddTask_Usecase{
     private taskRepository: TaskRepository;
 
     constructor(taskRepository: TaskRepository){

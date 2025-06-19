@@ -1,7 +1,7 @@
 import { TaskEntity } from "../entities/TaskEntity";
 import { TaskRepository } from "../repositories/TaskRepository";
 
-export class GetAllTasksUsecase {
+export class GetAllTask_Usecase {
     private taskRepository: TaskRepository;
 
     constructor(taskRepository: TaskRepository) {

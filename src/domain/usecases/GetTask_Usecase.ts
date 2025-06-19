@@ -1,13 +1,14 @@
+import { TaskEntity } from "../entities/TaskEntity";
 import { TaskRepository } from "../repositories/TaskRepository";
 
-export class RemoveTaskUsecase {
+export class GetTask_Usecase {
     private taskRepository: TaskRepository;
 
     constructor(taskRepository: TaskRepository) {
         this.taskRepository = taskRepository;
     }
 
-    async execute(id: number): Promise<void> {
-        return this.taskRepository.removeTask(id);
+    async execute(id: number): Promise<TaskEntity | undefined> {
+        return this.taskRepository.getTask(id);
     }
 }

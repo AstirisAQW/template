@@ -6,7 +6,7 @@ export interface UpdateTaskParams {
     title: string;
 }
 
-export class UpdateTaskUsecase {
+export class UpdateTask_Usecase {
     private taskRepository: TaskRepository;
 
     constructor(taskRepository: TaskRepository) {
