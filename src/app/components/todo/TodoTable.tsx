@@ -10,10 +10,20 @@ export interface TodoType {
 interface TodoTableProps {
     data?: TodoType[];
     onDelete?: (record: TodoType) => void;
+    onUpdate?: (record: TodoType) => void;
 }
 
-function getColumns(onDelete?: (record: TodoType) => void): ColumnsType<TodoType> {
+function getColumns(
+    onDelete?: (record: TodoType) => void,
+    onUpdate?: (record: TodoType) => void
+)   : ColumnsType<TodoType> {
     return [
+        {
+            title: 'ID',
+            dataIndex: 'id',
+            key: 'id',
+            width: '80',
+        },
         {
             title: 'Title',
             dataIndex: 'title',
@@ -22,11 +32,23 @@ function getColumns(onDelete?: (record: TodoType) => void): ColumnsType<TodoType
         {
             title: 'Action',
             key: 'action',
+            width: 200,
             render: (_, record) => {
                 return (
                     <Space size="middle">
-                        <Button danger onClick={() => {
-                            onDelete && onDelete(record)
+                        <Button
+                            type = "primary"
+                            ghost
+                            onClick={()=>{
+                                onUpdate && onUpdate(record);
+                            }}
+                        >
+                            Update
+                        </Button>
+                        <Button
+                            danger
+                            onClick={() => {
+                                onDelete && onDelete(record)
                         }}>
                             Delete
                         </Button>
@@ -37,12 +59,12 @@ function getColumns(onDelete?: (record: TodoType) => void): ColumnsType<TodoType
     ];
 }
 
-function TodoTable({ data, onDelete }: TodoTableProps) {
+function TodoTable({ data, onDelete, onUpdate }: TodoTableProps) {
     return (
         <Table
             rowKey="id"
             size="large"
-            columns={getColumns(onDelete)}
+            columns={getColumns(onDelete, onUpdate)}
             dataSource={data}
         />
     );

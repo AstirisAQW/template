@@ -1,17 +1,22 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import 'antd/dist/reset.css';
-import { Button, Input, Typography, Row, Col, notification, Spin } from 'antd';
+import './SinglePage.css';
+import { Button, Input, Typography, Row, Col, notification, Spin, Modal } from 'antd'; // Added Modal
 import TodoTable from '../components/todo/TodoTable';
 import { TaskEntity } from '../../domain/entities/TaskEntity';
-import { GetAllTask_Service, GetTask_Service, RemoveTask_Service, UpdateTask_Service, AddTask_Service} from "../services/taskServices";
+import { GetAllTask_Service, RemoveTask_Service, UpdateTask_Service, AddTask_Service} from "../services/taskServices";
 
 
 function SinglePage() {
   const [taskTitle, setTaskTitle] = useState("");
   const [tasks, setTasks] = useState<TaskEntity[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true); // For loading state
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Fetch all tasks when the component mounts
+  // State for Edit Modal
+  const [isEditModalVisible, setIsEditModalVisible] = useState<boolean>(false);
+  const [currentEditingTask, setCurrentEditingTask] = useState<TaskEntity | null>(null);
+  const [editedTaskTitle, setEditedTaskTitle] = useState<string>("");
+
   const loadTasks = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -26,7 +31,7 @@ function SinglePage() {
     } finally {
       setIsLoading(false);
     }
-  }, []); // No dependencies other than the use case itself, which is stable
+  }, []);
 
   useEffect(() => {
     loadTasks();
@@ -38,19 +43,18 @@ function SinglePage() {
 
   const handleSubmitTask = async () => {
     if (!taskTitle.trim()) {
-      notification.error({
-        message: 'Unable to submit task',
-        description: 'Please input the title of the Task.',
+      notification.warning({ // Changed to warning for non-critical user error
+        message: 'Input required',
+        description: 'Please enter a title for the task.',
       });
       return;
     }
 
-    setIsLoading(true); // Indicate loading for add operation
+    setIsLoading(true);
     try {
-      // The AddTaskUsecase expects params like { title: string }
       const newTaskEntity = await AddTask_Service.execute({ title: taskTitle });
-      setTasks(prevTasks => [...prevTasks, newTaskEntity]); // Add to local state
-      setTaskTitle(""); // Clear input
+      setTasks(prevTasks => [...prevTasks, newTaskEntity]);
+      setTaskTitle("");
       notification.success({
         message: 'Task added successfully!',
       });
@@ -66,10 +70,10 @@ function SinglePage() {
   };
 
   const handleDeleteTask = async (taskToDelete: TaskEntity) => {
-    setIsLoading(true); // Indicate loading for delete operation
+    setIsLoading(true);
     try {
       await RemoveTask_Service.execute(taskToDelete.id);
-      setTasks(prevTasks => prevTasks.filter(task => task.id !== taskToDelete.id)); // Remove from local state
+      setTasks(prevTasks => prevTasks.filter(task => task.id !== taskToDelete.id));
       notification.success({
         message: 'Task deleted successfully!',
       });
@@ -84,36 +88,57 @@ function SinglePage() {
     }
   };
 
-  // If you decide to add an update feature, it would look something like this:
-   const handleUpdateTask = async (taskToUpdate: TaskEntity, newTitle: string) => {
-   setIsLoading(true);
-   try {
-     const updatedTask = await UpdateTask_Service.execute({ id: taskToUpdate.id, title: newTitle });
-       setTasks(prevTasks => prevTasks.map(task => (task.id === updatedTask.id ? updatedTask : task)));
-       notification.success({ message: 'Task updated successfully!' });
-     } catch (error: any) {
-       console.error("Failed to update task:", error);
-       notification.error({ message: 'Failed to update task', description: error.message });
-     } finally {
-       setIsLoading(false);
-     }
+   const handleUpdateTask = async () => { // Modified to use state for editing
+    if (!currentEditingTask || !editedTaskTitle.trim()) {
+      notification.warning({
+        message: 'Input required',
+        description: 'Please ensure the task title is not empty.',
+      });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const updatedTask = await UpdateTask_Service.execute({ id: currentEditingTask.id, title: editedTaskTitle });
+      setTasks(prevTasks => prevTasks.map(task => (task.id === updatedTask.id ? updatedTask : task)));
+      notification.success({ message: 'Task updated successfully!' });
+      setIsEditModalVisible(false); // Close modal on success
+      setCurrentEditingTask(null);
+    } catch (error: any) {
+      console.error("Failed to update task:", error);
+      notification.error({ message: 'Failed to update task', description: error.message || 'Could not update the task.' });
+    } finally {
+      setIsLoading(false);
+    }
    };
 
+  // Handler for opening the edit modal
+  const showEditModal = (taskToEdit: TaskEntity) => {
+    setCurrentEditingTask(taskToEdit);
+    setEditedTaskTitle(taskToEdit.title);
+    setIsEditModalVisible(true);
+  };
+
+  const handleEditModalCancel = () => {
+    setIsEditModalVisible(false);
+    setCurrentEditingTask(null);
+    setEditedTaskTitle(""); // Reset title
+  };
+
   return (
-    <div style={{ padding: 20 }}>
+    <div className="single-page-container">
       <Row justify="center">
         <Col xs={24} sm={20} md={16} lg={12} xl={10}>
-          <Typography.Title level={2} style={{ textAlign: 'center', marginBottom: 20 }}>
+          <Typography.Title level={2} className="page-title">
             Task Management (Clean Architecture)
           </Typography.Title>
 
-          <Input.Group compact style={{ marginBottom: 20 }}>
+          <Input.Group compact className="add-task-input-group">
             <Input
-              style={{ width: 'calc(100% - 100px)' }} // Adjusted width
+              style={{ width: 'calc(100% - 100px)' }}
               value={taskTitle}
               onChange={handleOnChangeTaskTitle}
               placeholder="Enter task title"
-              onPressEnter={handleSubmitTask} // Allow submit on Enter
+              onPressEnter={handleSubmitTask}
               disabled={isLoading}
             />
             <Button type="primary" onClick={handleSubmitTask} loading={isLoading} style={{ width: 100 }}>
@@ -121,22 +146,41 @@ function SinglePage() {
             </Button>
           </Input.Group>
 
-          {isLoading && tasks.length === 0 ? ( // Show spinner only on initial load
-             <div style={{ textAlign: 'center', margin: '20px 0' }}><Spin size="large" /></div>
+          {isLoading && tasks.length === 0 ? (
+             <div className="spinner-container"><Spin size="large" /></div>
           ) : (
-            <TodoTable 
-              data={tasks} 
-              onDelete={handleDeleteTask} 
-              // Pass an onUpdate handler if you implement update in TodoTable
+            <TodoTable
+              data={tasks}
+              onDelete={handleDeleteTask}
+              onUpdate={showEditModal} // Pass the handler to open edit modal
             />
           )}
           {tasks.length === 0 && !isLoading && (
-            <Typography.Text style={{ textAlign: 'center', display: 'block' }}>
+            <Typography.Text className="no-tasks-message">
               No tasks yet. Add one above!
             </Typography.Text>
           )}
         </Col>
       </Row>
+
+      {/* Edit Task Modal */}
+      {currentEditingTask && (
+        <Modal
+          title="Edit Task"
+          visible={isEditModalVisible}
+          onOk={handleUpdateTask} // This is the actual update submission
+          onCancel={handleEditModalCancel}
+          confirmLoading={isLoading} // Show loading state on OK button
+          okText="Save Changes"
+        >
+          <Input
+            value={editedTaskTitle}
+            onChange={(e) => setEditedTaskTitle(e.target.value)}
+            placeholder="Enter new task title"
+            onPressEnter={handleUpdateTask}
+          />
+        </Modal>
+      )}
     </div>
   );
 }
