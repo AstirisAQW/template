@@ -1,6 +1,7 @@
 import React from 'react';
 import { Table, Space, Button } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
+import type { TableColumnsType } from 'antd';
+
 
 export interface TodoType {
     id: number;
@@ -16,7 +17,7 @@ interface TodoTableProps {
 function getColumns(
     onDelete?: (record: TodoType) => void,
     onUpdate?: (record: TodoType) => void
-)   : ColumnsType<TodoType> {
+)   : TableColumnsType<TodoType> {
     return [
         {
             title: 'ID',

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import 'antd/dist/reset.css';
 import './SinglePage.css';
-import { Button, Input, Typography, Row, Col, notification, Spin, Modal } from 'antd'; // Added Modal
+import { Button, Input, Typography, Row, Col, notification, Spin, Modal } from 'antd';
 import TodoTable from '../components/todo/TodoTable';
 import { TaskEntity } from '../../domain/entities/TaskEntity';
 import { GetAllTask_Service, RemoveTask_Service, UpdateTask_Service, AddTask_Service} from "../services/taskServices";
@@ -126,11 +126,16 @@ function SinglePage() {
 
   return (
     <div className="single-page-container">
+      <div className="page-header">
+
+        <Typography.Title level={2} className="page-header-title">
+          TaskList (Clean Architecture)
+        </Typography.Title>
+      </div>
+
       <Row justify="center">
         <Col xs={24} sm={20} md={16} lg={12} xl={10}>
-          <Typography.Title level={2} className="page-title">
-            Task Management (Clean Architecture)
-          </Typography.Title>
+
 
           <Input.Group compact className="add-task-input-group">
             <Input
@@ -157,13 +162,12 @@ function SinglePage() {
           )}
           {tasks.length === 0 && !isLoading && (
             <Typography.Text className="no-tasks-message">
-              No tasks yet. Add one above!
+              No tasks yet.
             </Typography.Text>
           )}
         </Col>
       </Row>
 
-      {/* Edit Task Modal */}
       {currentEditingTask && (
         <Modal
           title="Edit Task"
