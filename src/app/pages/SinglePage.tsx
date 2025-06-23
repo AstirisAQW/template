@@ -8,14 +8,14 @@ import { GetAllTask_Service, RemoveTask_Service, UpdateTask_Service, AddTask_Ser
 
 
 function SinglePage() {
-  const [taskTitle, setTaskTitle] = useState("");
+  const [taskContent, setTaskContent] = useState("");
   const [tasks, setTasks] = useState<TaskEntity[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // State for Edit Modal
   const [isEditModalVisible, setIsEditModalVisible] = useState<boolean>(false);
   const [currentEditingTask, setCurrentEditingTask] = useState<TaskEntity | null>(null);
-  const [editedTaskTitle, setEditedTaskTitle] = useState<string>("");
+  const [editedTaskContent, setEditedTaskContent] = useState<string>("");
 
   const loadTasks = useCallback(async () => {
     setIsLoading(true);
@@ -38,15 +38,15 @@ function SinglePage() {
     loadTasks();
   }, [loadTasks]);
 
-  const handleOnChangeTaskTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTaskTitle(e.target.value);
+  const handleOnChangeTaskContent = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTaskContent(e.target.value);
   };
 
   const handleSubmitTask = async () => {
-    if (!taskTitle.trim()) {
+    if (!taskContent.trim()) {
       notification.warning({ // Changed to warning for non-critical user error
         message: 'Input required',
-        description: 'Please enter a title for the task.',
+        description: 'Task cannot be empty.',
         placement: 'bottomRight',
       });
       return;
@@ -54,9 +54,9 @@ function SinglePage() {
 
     setIsLoading(true);
     try {
-      const newTaskEntity = await AddTask_Service.execute({ title: taskTitle });
+      const newTaskEntity = await AddTask_Service.execute({ content: taskContent});
       setTasks(prevTasks => [...prevTasks, newTaskEntity]);
-      setTaskTitle("");
+      setTaskContent("");
       notification.success({
         message: 'Task added successfully!',
         placement: 'bottomRight'
@@ -95,7 +95,7 @@ function SinglePage() {
   };
 
    const handleUpdateTask = async () => { // Modified to use state for editing
-    if (!currentEditingTask || !editedTaskTitle.trim()) {
+    if (!currentEditingTask || !editedTaskContent.trim()) {
       notification.warning({
         message: 'Input required',
         description: 'Please ensure the task title is not empty.',
@@ -105,7 +105,7 @@ function SinglePage() {
     }
     setIsLoading(true);
     try {
-      const updatedTask = await UpdateTask_Service.execute({ id: currentEditingTask.id, title: editedTaskTitle });
+      const updatedTask = await UpdateTask_Service.execute({ id: currentEditingTask.id, content: editedTaskContent });
       setTasks(prevTasks => prevTasks.map(task => (task.id === updatedTask.id ? updatedTask : task)));
       notification.success({ message: 'Task updated successfully!', placement: 'bottomRight'});
       setIsEditModalVisible(false); // Close modal on success
@@ -121,14 +121,14 @@ function SinglePage() {
   // Handler for opening the edit modal
   const showEditModal = (taskToEdit: TaskEntity) => {
     setCurrentEditingTask(taskToEdit);
-    setEditedTaskTitle(taskToEdit.title);
+    setEditedTaskContent(taskToEdit.content);
     setIsEditModalVisible(true);
   };
 
   const handleEditModalCancel = () => {
     setIsEditModalVisible(false);
     setCurrentEditingTask(null);
-    setEditedTaskTitle(""); // Reset title
+    setEditedTaskContent(""); // Reset title
   };
 
   return (
@@ -147,9 +147,9 @@ function SinglePage() {
           <Input.Group compact className="add-task-input-group">
             <Input
               style={{ width: 'calc(100% - 100px)' }}
-              value={taskTitle}
-              onChange={handleOnChangeTaskTitle}
-              placeholder="Enter task title"
+              value={taskContent}
+              onChange={handleOnChangeTaskContent}
+              placeholder="Enter task"
               onPressEnter={handleSubmitTask}
               disabled={isLoading}
             />
@@ -185,8 +185,8 @@ function SinglePage() {
           okText="Save Changes"
         >
           <Input
-            value={editedTaskTitle}
-            onChange={(e) => setEditedTaskTitle(e.target.value)}
+            value={editedTaskContent}
+            onChange={(e) => setEditedTaskContent(e.target.value)}
             placeholder="Enter new task title"
             onPressEnter={handleUpdateTask}
           />

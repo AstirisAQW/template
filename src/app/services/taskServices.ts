@@ -31,8 +31,8 @@ export const UpdateTask_Service = new UpdateTask_Usecase(taskRepositoryInstance)
 export const GetTask_Service = new GetTask_Usecase(taskRepositoryInstance); // We'll prepare it
 
 // Helper type for params, can also be defined in usecase files
-export type AddTaskParams = { title: string };
-export type UpdateTaskParams = { id: number; title: string };
+export type AddTaskParams = { content: string };
+export type UpdateTaskParams = { id: number; content: string };
 
 
 

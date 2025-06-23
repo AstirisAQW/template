@@ -2,7 +2,7 @@ import { TaskEntity } from "../entities/TaskEntity";
 import { TaskRepository } from "../repositories/TaskRepository";
 
 export interface AddTaskParams{
-    title: string;
+    content: string;
 }
 
 export class AddTask_Usecase{
@@ -13,7 +13,7 @@ export class AddTask_Usecase{
     }
 
     async execute(params: AddTaskParams): Promise<TaskEntity> {
-        const taskToAdd = new TaskEntity(0, params.title);
+        const taskToAdd = new TaskEntity(0, params.content);
         return this.taskRepository.addTask(taskToAdd);
     }
 }

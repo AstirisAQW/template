@@ -35,7 +35,7 @@ export class LocalStorageTaskRepository implements TaskRepository {
         const currentTasks = this.getTasksFromStorage();
         const nextId = this.getNextId(currentTasks);
         // We use the title from the input task, but generate a new ID
-        const newTask = new TaskEntity(nextId, task.title); 
+        const newTask = new TaskEntity(nextId, task.content); 
         currentTasks.push(newTask);
         this.saveTasksToStorage(currentTasks);
         return newTask;

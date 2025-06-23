@@ -5,7 +5,7 @@ import type { TableColumnsType } from 'antd';
 
 export interface TodoType {
     id: number;
-    title: string;
+    content: string;
 }
 
 interface TodoTableProps {
@@ -26,9 +26,9 @@ function getColumns(
             width: '50px',
         },
         {
-            title: 'Title',
-            dataIndex: 'title',
-            key: 'title',
+            title: 'Task',
+            dataIndex: 'content',
+            key: 'content',
             ellipsis: true,
         },
         {

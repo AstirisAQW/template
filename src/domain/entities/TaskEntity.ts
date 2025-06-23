@@ -1,9 +1,9 @@
 export class TaskEntity {
     public id: number;
-    public title: string;
+    public content: string;
 
-    constructor(id: number, title: string) {
+    constructor(id: number, content: string) {
         this.id = id;
-        this.title = title;
+        this.content = content;
     }
 }

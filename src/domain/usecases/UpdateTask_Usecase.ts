@@ -3,7 +3,7 @@ import { TaskRepository } from "../repositories/TaskRepository";
 
 export interface UpdateTaskParams {
     id: number;
-    title: string;
+    content: string;
 }
 
 export class UpdateTask_Usecase {
@@ -14,7 +14,7 @@ export class UpdateTask_Usecase {
     }
 
     async execute(params: UpdateTaskParams): Promise<TaskEntity> {
-        const taskToUpdate = new TaskEntity(params.id, params.title);
+        const taskToUpdate = new TaskEntity(params.id, params.content);
         return this.taskRepository.updateTask(taskToUpdate);
     }
 }
