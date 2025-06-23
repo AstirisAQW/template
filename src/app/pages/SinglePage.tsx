@@ -27,6 +27,7 @@ function SinglePage() {
       notification.error({
         message: 'Failed to load tasks',
         description: error.message || 'Could not retrieve tasks.',
+        placement: 'bottomRight',
       });
     } finally {
       setIsLoading(false);
@@ -46,6 +47,7 @@ function SinglePage() {
       notification.warning({ // Changed to warning for non-critical user error
         message: 'Input required',
         description: 'Please enter a title for the task.',
+        placement: 'bottomRight',
       });
       return;
     }
@@ -57,12 +59,14 @@ function SinglePage() {
       setTaskTitle("");
       notification.success({
         message: 'Task added successfully!',
+        placement: 'bottomRight'
       });
     } catch (error: any) {
       console.error("Failed to add task:", error);
       notification.error({
         message: 'Failed to add task',
         description: error.message || 'Could not save the new task.',
+        placement: 'bottomRight',
       });
     } finally {
       setIsLoading(false);
@@ -76,12 +80,14 @@ function SinglePage() {
       setTasks(prevTasks => prevTasks.filter(task => task.id !== taskToDelete.id));
       notification.success({
         message: 'Task deleted successfully!',
+        placement: 'bottomRight',
       });
     } catch (error: any) {
       console.error("Failed to delete task:", error);
       notification.error({
         message: 'Failed to delete task',
         description: error.message || 'Could not remove the task.',
+        placement: 'bottomRight',
       });
     } finally {
       setIsLoading(false);
@@ -93,6 +99,7 @@ function SinglePage() {
       notification.warning({
         message: 'Input required',
         description: 'Please ensure the task title is not empty.',
+        placement: 'bottomRight',
       });
       return;
     }
@@ -100,12 +107,12 @@ function SinglePage() {
     try {
       const updatedTask = await UpdateTask_Service.execute({ id: currentEditingTask.id, title: editedTaskTitle });
       setTasks(prevTasks => prevTasks.map(task => (task.id === updatedTask.id ? updatedTask : task)));
-      notification.success({ message: 'Task updated successfully!' });
+      notification.success({ message: 'Task updated successfully!', placement: 'bottomRight'});
       setIsEditModalVisible(false); // Close modal on success
       setCurrentEditingTask(null);
     } catch (error: any) {
       console.error("Failed to update task:", error);
-      notification.error({ message: 'Failed to update task', description: error.message || 'Could not update the task.' });
+      notification.error({ message: 'Failed to update task',placement: 'bottomRight', description: error.message || 'Could not update the task.' });
     } finally {
       setIsLoading(false);
     }
