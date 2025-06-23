@@ -23,12 +23,13 @@ function getColumns(
             title: 'ID',
             dataIndex: 'id',
             key: 'id',
-            width: '80',
+            width: '50px',
         },
         {
             title: 'Title',
             dataIndex: 'title',
             key: 'title',
+            ellipsis: true,
         },
         {
             title: 'Action',
@@ -67,6 +68,7 @@ function TodoTable({ data, onDelete, onUpdate }: TodoTableProps) {
             size="large"
             columns={getColumns(onDelete, onUpdate)}
             dataSource={data}
+            bordered
         />
     );
 }
