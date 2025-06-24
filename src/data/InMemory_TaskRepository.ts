@@ -6,7 +6,7 @@ export class InMemoryTaskRepository implements TaskRepository {
     private nextId: number = 1;
 
     async addTask(task: TaskEntity): Promise<TaskEntity> {
-        const newTask = new TaskEntity(this.nextId++, task.content);
+        const newTask = new TaskEntity(this.nextId++, task.content, task.completed);
         this.tasks.push(newTask);
         return newTask;
     }

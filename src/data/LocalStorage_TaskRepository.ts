@@ -9,9 +9,10 @@ export class LocalStorageTaskRepository implements TaskRepository {
         const tasksJson = localStorage.getItem(LOCAL_STORAGE_KEY);
         if (tasksJson) {
             try {
-                // Parse and ensure they are TaskEntity instances
-                const parsedTasks = JSON.parse(tasksJson) as Array<{id: number, title: string}>;
-                return parsedTasks.map(task => new TaskEntity(task.id, task.title));
+                const parsedTasks = JSON.parse(tasksJson) as Array<{id: number, content: string, completed?: boolean}>;
+                return parsedTasks.map(task => new TaskEntity(
+                    task.id, task.content, task.completed || false
+                ));
             } catch (error) {
                 console.error("Error parsing tasks from localStorage", error);
                 return [];
@@ -34,8 +35,7 @@ export class LocalStorageTaskRepository implements TaskRepository {
     async addTask(task: TaskEntity): Promise<TaskEntity> {
         const currentTasks = this.getTasksFromStorage();
         const nextId = this.getNextId(currentTasks);
-        // We use the title from the input task, but generate a new ID
-        const newTask = new TaskEntity(nextId, task.content); 
+        const newTask = new TaskEntity(nextId, task.content, task.completed); 
         currentTasks.push(newTask);
         this.saveTasksToStorage(currentTasks);
         return newTask;
