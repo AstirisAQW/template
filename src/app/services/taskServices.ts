@@ -9,19 +9,10 @@ import { UpdateTask_Usecase } from "../../domain/usecases/UpdateTask_Usecase";
 import { GetTask_Usecase } from "../../domain/usecases/GetTask_Usecase";
 
 // --- Configuration for Switching Repository ---
-// Change this to false to use InMemoryTaskRepository
-const USE_LOCAL_STORAGE_FOR_TASKS = true;
-// ---------------------------------------------
 
-let taskRepositoryInstance: TaskRepository;
+let taskRepositoryInstance=new LocalStorageTaskRepository();
+// let taskRepositoryInstance=new InMemoryTaskRepository();
 
-if (USE_LOCAL_STORAGE_FOR_TASKS) {
-    taskRepositoryInstance = new LocalStorageTaskRepository();
-    console.log("Using LocalStorageTaskRepository for tasks.");
-} else {
-    taskRepositoryInstance = new InMemoryTaskRepository();
-    console.log("Using InMemoryTaskRepository for tasks.");
-}
 
 // Instantiate use cases with the chosen repository instance
 export const AddTask_Service = new AddTask_Usecase(taskRepositoryInstance);
