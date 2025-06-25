@@ -47,10 +47,7 @@ function getColumns(
                     {completed ? 'Completed' : 'Pending'}
                 </Checkbox>
             ),
-            filters: [
-                { text: 'Pending', value: false },
-                { text: 'Completed', value: true },
-            ],
+
             onFilter: (value, record) => record.completed === value,
         },
         {
@@ -92,7 +89,7 @@ function TodoTable({ data, onDelete, onUpdate, onToggleComplete }: TodoTableProp
             columns={getColumns(onDelete, onUpdate, onToggleComplete)}
             dataSource={data}
             bordered
-            pagination={{ pageSize: 10 }}
+            pagination={{ pageSize: 5 }}
         />
     );
 }

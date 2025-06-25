@@ -12,9 +12,8 @@ function SinglePage() {
   const [taskContent, setTaskContent] = useState("");
   const [tasks, setTasks] = useState<TaskEntity[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [filter, setFilter] = useState<FilterStatus>('all'); // Added filter state
+  const [filter, setFilter] = useState<FilterStatus>('all');
 
-  // State for Edit Modal (for content editing)
   const [isEditModalVisible, setIsEditModalVisible] = useState<boolean>(false);
   const [currentEditingTask, setCurrentEditingTask] = useState<TaskEntity | null>(null);
   const [editedTaskContent, setEditedTaskContent] = useState<string>("");
@@ -190,15 +189,13 @@ function SinglePage() {
     Modal.confirm({
         title: 'Delete All Completed Tasks?',
         content: `Are you sure you want to delete ${completedTasks.length} completed task(s)?`,
-        okText: 'Yes, Delete All',
+        okText: 'Delete All',
         okType: 'danger',
-        cancelText: 'No, Cancel',
+        cancelText: 'Cancel',
         onOk: async () => {
             setIsLoading(true);
             try {
-              // Perform all delete operations
               await Promise.all(completedTasks.map(task => RemoveTask_Service.execute(task.id)));
-              // Update local state by removing all completed tasks
               setTasks(prevTasks => prevTasks.filter(task => !task.completed).sort((a,b) => a.id - b.id));
               notification.success({
                 message: 'All completed tasks deleted successfully!',
@@ -235,7 +232,7 @@ function SinglePage() {
       </div>
 
       <Row justify="center">
-        <Col xs={24} sm={20} md={16} lg={12} xl={10}>
+        <Col xs={24} style={{ maxWidth: '900px', margin: '0 auto' }}>
           <Input.Group compact className="add-task-input-group">
             <Input
               style={{ width: 'calc(100% - 100px)' }}
@@ -260,13 +257,13 @@ function SinglePage() {
               danger
               onClick={handleDeleteAllCompletedTasks}
               loading={isLoading}
-              disabled={tasks.filter(t => t.completed).length === 0 || isLoading} // Disable if no completed tasks or loading
+              disabled={tasks.filter(t => t.completed).length === 0 || isLoading}
             >
               Delete All Completed
             </Button>
           </Space>
 
-          {isLoading && tasks.length === 0 && filter === 'all' ? ( // Show spinner only on initial load
+          {isLoading && tasks.length === 0 && filter === 'all' ? (
              <div className="spinner-container"><Spin size="large" /></div>
           ) : (
             <TodoTable
@@ -278,7 +275,7 @@ function SinglePage() {
           )}
           {filteredTasks.length === 0 && !isLoading && (
             <Typography.Text className="no-tasks-message" style={{ display: 'block', textAlign: 'center', marginTop: 20 }}>
-              {tasks.length === 0 && filter === 'all' ? 'No tasks yet. Add one above!' : `No tasks match the filter: "${filter}".`}
+              {tasks.length === 0 && filter === 'all' ? 'No tasks yet.' : `No tasks match the filter: "${filter}".`}
             </Typography.Text>
           )}
         </Col>
