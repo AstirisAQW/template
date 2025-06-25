@@ -3,7 +3,7 @@ export class TaskEntity {
     public content: string;
     public completed: boolean;
 
-    constructor(id: number, content: string, completed:boolean) {
+    constructor(id: number, content: string, completed:boolean = false) {
         this.id = id;
         this.content = content;
         this.completed = completed;
