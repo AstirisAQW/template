@@ -1,35 +1,57 @@
 import React from 'react';
-import { Table, Space, Button } from 'antd';
+import { Table, Space, Button, Checkbox } from 'antd';
 import type { TableColumnsType } from 'antd';
-
-
-export interface TodoType {
-    id: number;
-    content: string;
-}
+import { TaskEntity } from '../../../domain/entities/TaskEntity';
 
 interface TodoTableProps {
-    data?: TodoType[];
-    onDelete?: (record: TodoType) => void;
-    onUpdate?: (record: TodoType) => void;
+    data?: TaskEntity[];
+    onDelete?: (record: TaskEntity) => void;
+    onUpdate?: (record: TaskEntity) => void;
+    onToggleComplete?: (record: TaskEntity) => void;
 }
 
 function getColumns(
-    onDelete?: (record: TodoType) => void,
-    onUpdate?: (record: TodoType) => void
-)   : TableColumnsType<TodoType> {
+    onDelete?: (record: TaskEntity) => void,
+    onUpdate?: (record: TaskEntity) => void,
+    onToggleComplete?: (record: TaskEntity) => void
+): TableColumnsType<TaskEntity> {
     return [
         {
             title: 'ID',
             dataIndex: 'id',
             key: 'id',
-            width: '50px',
+            width: '80px',
+            sorter: (a, b) => a.id - b.id,
         },
         {
             title: 'Task',
             dataIndex: 'content',
             key: 'content',
             ellipsis: true,
+            render: (text, record) => (
+                <span style={{ textDecoration: record.completed ? 'line-through' : 'none', color: record.completed ? '#aaa' : 'inherit' }}>
+                    {text}
+                </span>
+            ),
+        },
+        {
+            title: 'Status',
+            dataIndex: 'completed',
+            key: 'completed',
+            width: 120,
+            render: (completed: boolean, record: TaskEntity) => (
+                <Checkbox
+                    checked={completed}
+                    onChange={() => onToggleComplete && onToggleComplete(record)}
+                >
+                    {completed ? 'Completed' : 'Pending'}
+                </Checkbox>
+            ),
+            filters: [
+                { text: 'Pending', value: false },
+                { text: 'Completed', value: true },
+            ],
+            onFilter: (value, record) => record.completed === value,
         },
         {
             title: 'Action',
@@ -39,19 +61,20 @@ function getColumns(
                 return (
                     <Space size="middle">
                         <Button
-                            type = "primary"
+                            type="primary"
                             ghost
-                            onClick={()=>{
+                            onClick={() => {
                                 onUpdate && onUpdate(record);
                             }}
                         >
-                            Update
+                            Edit
                         </Button>
                         <Button
                             danger
+                            disabled={!record.completed}
                             onClick={() => {
-                                onDelete && onDelete(record)
-                        }}>
+                                onDelete && onDelete(record);
+                            }}>
                             Delete
                         </Button>
                     </Space>
@@ -61,14 +84,15 @@ function getColumns(
     ];
 }
 
-function TodoTable({ data, onDelete, onUpdate }: TodoTableProps) {
+function TodoTable({ data, onDelete, onUpdate, onToggleComplete }: TodoTableProps) {
     return (
         <Table
             rowKey="id"
             size="large"
-            columns={getColumns(onDelete, onUpdate)}
+            columns={getColumns(onDelete, onUpdate, onToggleComplete)}
             dataSource={data}
             bordered
+            pagination={{ pageSize: 10 }}
         />
     );
 }

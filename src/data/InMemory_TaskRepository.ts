@@ -20,12 +20,12 @@ export class InMemoryTaskRepository implements TaskRepository {
         if (taskIndex === -1) {
             throw new Error(`Task with id ${taskToUpdate.id} not found`);
         }
-        this.tasks[taskIndex] = taskToUpdate;
-        return taskToUpdate;
+        this.tasks[taskIndex] = new TaskEntity(taskToUpdate.id, taskToUpdate.content,taskToUpdate.completed);
+        return this.tasks[taskIndex];
     }
 
     async getAllTasks(): Promise<TaskEntity[]> {
-        return [...this.tasks]; // Return a copy
+        return [...this.tasks];
     }
 
     async getTask(id: number): Promise<TaskEntity | undefined> {
