@@ -13,6 +13,10 @@ export class AddTask_Usecase{
     }
 
     async execute(params: AddTaskParams): Promise<TaskEntity> {
+        if (!params.content || params.content.trim() === ""){
+            throw new Error ("Task content cannot be empty");
+        }
+        
         const taskToAdd = new TaskEntity(0, params.content);
         return this.taskRepository.addTask(taskToAdd);
     }

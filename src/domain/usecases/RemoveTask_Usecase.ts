@@ -8,6 +8,16 @@ export class RemoveTask_Usecase {
     }
 
     async execute(id: number): Promise<void> {
+        const taskToRemove = await this.taskRepository.getTask(id);
+
+        if (!taskToRemove) {
+            throw new Error(`Task with id ${id} not found, cannot remove.`);
+        }
+
+        if (!taskToRemove.completed) {
+            throw new Error("Task must be marked as completed before it can be deleted.");
+        }
+        
         return this.taskRepository.removeTask(id);
     }
 }

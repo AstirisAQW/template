@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import 'antd/dist/reset.css';
 import './SinglePage.css';
-import { Button, Input, Typography, Row, Col, notification, Spin, Modal, Radio, Space } from 'antd'; // Added Radio, Space
+import { Button, Input, Typography, Row, Col, notification, Spin, Modal, Radio, Space } from 'antd';
 import TodoTable from '../components/todo/TodoTable';
 import { TaskEntity } from '../../domain/entities/TaskEntity';
 import { GetAllTask_Service, RemoveTask_Service, UpdateTask_Service, AddTask_Service} from "../services/taskServices";
@@ -22,7 +22,7 @@ function SinglePage() {
     setIsLoading(true);
     try {
       const fetchedTasks = await GetAllTask_Service.execute();
-      setTasks(fetchedTasks.sort((a,b) => a.id - b.id)); // Sort by ID for consistent order
+      setTasks(fetchedTasks.sort((a,b) => a.id - b.id));
     } catch (error: any) {
       console.error("Failed to load tasks:", error);
       notification.error({
@@ -43,20 +43,18 @@ function SinglePage() {
     setTaskContent(e.target.value);
   };
 
-  const handleSubmitTask = async () => {
-    if (!taskContent.trim()) {
-      notification.warning({
-        message: 'Input required',
-        description: 'Task content cannot be empty.',
-        placement: 'bottomRight',
-      });
-      return;
-    }
+  const handleAddTask = async () => {
+    // if (!taskContent.trim()) {
+    //   notification.warning({
+    //     message: 'Input required',
+    //     description: 'Task content cannot be empty.',
+    //     placement: 'bottomRight',
+    //   });
+    //   return;
+    // }
 
     setIsLoading(true);
     try {
-      // AddTask_Service's execute method takes { content: string }
-      // The TaskEntity created inside the usecase will have completed: false by default
       const newTaskEntity = await AddTask_Service.execute({ content: taskContent });
       setTasks(prevTasks => [...prevTasks, newTaskEntity].sort((a,b) => a.id - b.id));
       setTaskContent("");
@@ -77,14 +75,14 @@ function SinglePage() {
   };
 
   const handleDeleteTask = async (taskToDelete: TaskEntity) => {
-    if (!taskToDelete.completed) {
-      notification.warning({
-        message: 'Cannot Delete Task',
-        description: 'Task must be marked as completed before it can be deleted.',
-        placement: 'bottomRight',
-      });
-      return;
-    }
+    // if (!taskToDelete.completed) {
+    //   notification.warning({
+    //     message: 'Cannot Delete Task',
+    //     description: 'Task must be marked as completed before it can be deleted.',
+    //     placement: 'bottomRight',
+    //   });
+    //   return;
+    // }
 
     setIsLoading(true);
     try {
@@ -112,7 +110,6 @@ function SinglePage() {
       const updatedTask = await UpdateTask_Service.execute({
         id: taskToToggle.id,
         completed: !taskToToggle.completed,
-        // content is not changed here, so Usecase will use existing content
       });
       setTasks(prevTasks =>
         prevTasks.map(task => (task.id === updatedTask.id ? updatedTask : task)).sort((a,b) => a.id - b.id)
@@ -134,30 +131,45 @@ function SinglePage() {
   };
 
   const handleUpdateTaskContent = async () => {
-    if (!currentEditingTask || !editedTaskContent.trim()) {
-      notification.warning({
-        message: 'Input required',
-        description: 'Please ensure the task content is not empty.',
-        placement: 'bottomRight',
-      });
-      return;
+    // if (!currentEditingTask || !editedTaskContent.trim()) {
+    //   notification.warning({
+    //     message: 'Input required',
+    //     description: 'Please ensure the task content is not empty.',
+    //     placement: 'bottomRight',
+    //   });
+    //   return;
+    // }
+    if (!currentEditingTask) {
+        notification.warning({
+            message: 'No task selected',
+            description: 'Please select a task to edit.',
+            placement: 'bottomRight',
+        });
+        return;
     }
+
     setIsLoading(true);
     try {
       const updatedTask = await UpdateTask_Service.execute({
         id: currentEditingTask.id,
         content: editedTaskContent,
-        // completed status is not changed by this modal, only content
       });
       setTasks(prevTasks =>
         prevTasks.map(task => (task.id === updatedTask.id ? updatedTask : task)).sort((a,b) => a.id - b.id)
       );
-      notification.success({ message: 'Task content updated successfully!', placement: 'bottomRight'});
+      notification.success({
+        message: 'Task content updated successfully!',
+        placement: 'bottomRight'});
       setIsEditModalVisible(false);
       setCurrentEditingTask(null);
+      setEditedTaskContent("");
     } catch (error: any) {
       console.error("Failed to update task content:", error);
-      notification.error({ message: 'Failed to update task content',placement: 'bottomRight', description: error.message || 'Could not update the task content.' });
+      notification.error({ 
+        message: 'Failed to update task content',
+        placement: 'bottomRight', 
+        description: error.message || 'Could not update the task content.'
+    });
     } finally {
       setIsLoading(false);
     }
@@ -239,10 +251,10 @@ function SinglePage() {
               value={taskContent}
               onChange={handleOnChangeTaskContent}
               placeholder="Enter task content"
-              onPressEnter={handleSubmitTask}
+              onPressEnter={handleAddTask}
               disabled={isLoading}
             />
-            <Button type="primary" onClick={handleSubmitTask} loading={isLoading} style={{ width: 100 }}>
+            <Button type="primary" onClick={handleAddTask} loading={isLoading} style={{ width: 100 }}>
               Add Task
             </Button>
           </Input.Group>
